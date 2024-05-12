@@ -6,13 +6,13 @@ import time
 
 # Replace the file paths with the paths to your PNG images
 HANGMAN_PICS = [
-    "Add path of image 1 here",
-    "Add path of image 2 here",
-    "Add path of image 3 here",
-    "Add path of image 4 here",
-    "Add path of image 5 here",
-    "Add path of image 6 here",
-    "Add path of image 7 here"
+    "add path of image 1 here",
+    "add path of image 2 here",
+    "add path of image 3 here",
+    "add path of image 4 here",
+    "add path of image 5 here",
+    "add path of image 6 here",
+    "add path of image 7 here"
 ]
 
 countries = [
@@ -40,7 +40,7 @@ countries = [
 
 
 class StartPage:
-    def _init_(self, master):
+    def __init__(self, master):
         self.master = master
         self.master.title("Hangman Game")
         self.master.configure(bg="#E6E6FA")  # Set lavender background color
@@ -67,7 +67,7 @@ class StartPage:
 
 
 class HangmanGame:
-    def _init_(self, master, name):
+    def __init__(self, master, name):
         self.master = master
         self.master.title("Hangman Game")
         self.master.configure(bg="#E6E6FA")  # Set lavender background color
@@ -148,4 +148,95 @@ class HangmanGame:
     def initialize_game(self):
         self.missed_letters = ''
         self.correct_letters = ''
-        self.secret_word, self.hint =
+        self.secret_word, self.hint = getRandomCountry(countries)
+        self.update_display()
+
+    def update_display(self):
+        self.missed_letters_var.set(self.missed_letters)
+
+        blanks = ''
+        for letter in self.secret_word:
+            if letter in self.correct_letters:
+                blanks += letter + ' '
+            else:
+                blanks += '_ '
+        self.secret_word_var.set(blanks)
+
+        self.hint_var.set(self.hint)
+
+        self.draw_hangman(len(self.missed_letters))
+
+    def make_guess(self):
+        guess = self.guess_entry.get().lower()
+        self.guess_entry.delete(0, tk.END)
+
+        self.total_attempts += 1
+
+        if len(guess) != 1 or not guess.isalpha():
+            messagebox.showerror("Invalid Guess", "Please enter a single letter.")
+            return
+
+        if guess in self.correct_letters or guess in self.missed_letters:
+            messagebox.showwarning("Duplicate Guess", "You have already guessed that letter. Choose again.")
+            return
+
+        if guess in self.secret_word:
+            self.correct_letters += guess
+            self.correct_attempts += 1
+            self.animate_correct_guess()
+            self.update_display()  # Update display after correct guess
+            if self.check_win():
+                messagebox.showinfo("Congratulations",
+                                    f"{self.name}, you guessed it!\nThe secret word is '{self.secret_word}'. You win!\n\nTotal Attempts: {self.total_attempts}\nCorrect Attempts: {self.correct_attempts}\nIncorrect Attempts: {self.incorrect_attempts}")
+                self.initialize_game()
+        else:
+            self.missed_letters += guess
+            self.incorrect_attempts += 1
+            if len(self.missed_letters) == len(HANGMAN_PICS) - 1:
+                self.update_display()
+                messagebox.showinfo("Game Over",
+                                    f"{self.name}, you have run out of guesses!\nAfter {len(self.missed_letters)} missed guesses and {len(self.correct_letters)} correct guesses, the word was '{self.secret_word}'.\n\nTotal Attempts: {self.total_attempts}\nCorrect Attempts: {self.correct_attempts}\nIncorrect Attempts: {self.incorrect_attempts}")
+                self.initialize_game()
+            else:
+                self.animate_hangman(len(self.missed_letters))
+                self.update_display()
+
+    def check_win(self):
+        for letter in self.secret_word:
+            if letter not in self.correct_letters:
+                return False
+        return True
+
+    def draw_hangman(self, missed):
+        self.canvas.delete("hangman")
+
+        # Load the image based on the number of missed guesses
+        img_path = HANGMAN_PICS[missed]
+        img = Image.open(img_path)
+        img = img.resize((200, 200), Image.ANTIALIAS)  # Resize the image if needed
+        photo = ImageTk.PhotoImage(img)
+
+        # Create a label to display the image
+        self.canvas.image = photo  # Keep a reference to prevent garbage collection
+        self.canvas.create_image(200, 200, image=photo, anchor=tk.CENTER, tags="hangman")
+
+    def reset_game(self):
+        if messagebox.askyesno("Reset Game", "Are you sure you want to reset the game?"):
+            self.total_attempts = 0
+            self.correct_attempts = 0
+            self.incorrect_attempts = 0
+            self.initialize_game()
+
+
+def getRandomCountry(countriesList):
+    return random.choice(countriesList)
+
+
+def main():
+    root = tk.Tk()
+    start_page = StartPage(root)
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    main()
