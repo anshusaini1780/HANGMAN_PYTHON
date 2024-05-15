@@ -4,3 +4,16 @@ In this project, we aim to develop a Hangman game implementation in Python with 
 The objective of this project is twofold:
 1.	Implementing Hangman Game: Develop a fully functional Hangman game in Python that allows players to guess country names within a limited number of attempts. The game include features such as country-specific word selection, a timer, an instruction page.
 2.	Git Integration: Integrate Git version control into the Hangman game project to facilitate collaborative development, version tracking, and code management. Use Git for source code management, allowing multiple developers to work on the project concurrently while maintaining version history and managing code changes.
+
+# Versions
+V1(BASIC HANGMAN)
+V2(ENHANCED V1)
+V3(ADDED HANGMAN IMAGES)
+V4(ADDED NAME PAGE)
+V5(ADDED INSTRUCTION BOX)
+V6(ADDED TIMER)
+
+# Creators
+Anshdeep
+Anshu Saini(owner)
+Anshul
